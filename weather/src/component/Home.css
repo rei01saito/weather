@@ -1,0 +1,10 @@
+.container {
+  padding-top: 50px;
+  text-align: center;
+}
+
+.result {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
