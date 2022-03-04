@@ -29,6 +29,10 @@ function Home() {
       return;
     }
     console.log(weather);
+    let icon = weather["weather"][0]["icon"];
+    let iconurl = "http://openweathermap.org/img/w/" + icon + ".png";
+    let iconEl = document.querySelector('#icon');
+    iconEl.setAttribute('src', iconurl);
     
     // 5days forecast
     let forecast = await fetch(forecastAPI, {
@@ -85,7 +89,13 @@ function Home() {
         <p>(天気予報の結果をここに表示する)</p>
       </div>
       <div className='result' id='result'>
-        <div className='today'></div>
+        <div className='today'>
+        </div>
+        <div className='tomorrow'></div>
+      </div>
+      <div>
+        imgテスト
+          <img id="icon" src="" alt="Weather icon"/>
       </div>
     </div>
   )
