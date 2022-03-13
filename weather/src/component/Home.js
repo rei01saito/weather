@@ -12,76 +12,63 @@ function Home() {
       alert('現在地を入力してください。');
       return;
     }
-    const API_KEY = '167104da34f3de46ddfebdd2d4a09155'; // 後に.envを作ってgithubに公開しないようにする
-    const weatherAPI = 'https://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + API_KEY;
-    const forecastAPI = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city + '&appid=' + API_KEY;
-    
-    // Today's weather
-    let weather = await fetch(weatherAPI, {
+
+    // APIはenvにで管理
+    const API_KEY = process.env.REACT_APP_OPENWEATHERMAP_API_KEY;
+    const onecallAPI = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + lat + '&lon=' + lon + '&appid=' + API_KEY;
+
+    // One call api test(3/5 これを使うことに決定。現在の11:00から一週間分の11:00のデータが表示される)
+    let onecall = await fetch(onecallAPI, {
       method: 'GET',
       mode: 'cors'
     })
     .then(response => response.json())
-    .then(data => data)
+    .then(data => data.daily)
     
-    if (weather.cod === '404') {
+    if (onecall.cod === '404') {
       alert('入力された場所の天気情報はありませんでした。');
       return;
     }
-    console.log(weather);
-    let icon = weather["weather"][0]["icon"];
-    let iconurl = "http://openweathermap.org/img/w/" + icon + ".png";
-    let iconEl = document.querySelector('#icon');
-    iconEl.setAttribute('src', iconurl);
-    
-    // 5days forecast
-    let forecast = await fetch(forecastAPI, {
-      method: 'GET',
-      mode: 'cors'
-    })
-    .then(response => response.json())
-    .then(data => data.list);
-    console.log(forecast[0]);
+    console.log('-----------');
+    console.log(onecall);
+    console.log('-----------')
+
+    // onecall apiで取得したdailyデータ
+    let today = onecall[0].weather[0]; 
+    let tomorr = onecall[1].weather[0];
+
+    let todayIconUrl = "http://openweathermap.org/img/w/" + today.icon + ".png";
+    let tomorrowIconUrl = "http://openweathermap.org/img/w/" + tomorr.icon + ".png";
 
     const result = document.querySelector('#result');
 
-    // 天気予報リスト
-    // Object.values(weather).forEach(value => {
-    //   const currentDate = convertJST(value);
-    //   const element = document.createElement('div');
-    //   element.classList.add('weather-list');
-    //   element.textContent = currentDate + ': ' + value["weather"][0]["description"];
-    //   result.append(element);
-    // });
-
-    let date = new Date();
-    let str = date.getFullYear()
-      + '/' + ('0' + (date.getMonth() + 1)).slice(-2)
-      + '/' + ('0' + date.getDate()).slice(-2)
-      + ' ' + ('0' + date.getHours()).slice(-2)
-      + ':' + ('0' + date.getMinutes()).slice(-2);
+    // 今日
     const todayResult = document.querySelector('.today');
-    todayResult.textContent = '現在の' + str + 'の天気は' + weather["weather"][0]["description"];
+    todayResult.textContent = '現在のの天気は ' + today.description + ' です。';
+    document.querySelector('#today-icon').setAttribute('src', todayIconUrl);
 
-    const tomorrow = forecast[0];
-    const currentDate = convertJST(tomorrow);
-    const element = document.createElement('div');
-    element.classList.add('tomorrow');
-    element.textContent = '明日の' + currentDate + ': ' + tomorrow["weather"][0]["description"];
-    result.append(element);
+    document.querySelector('.today-img').classList.remove('hidden');
+
+    // 明日
+    const tomorrowResult = document.querySelector('.tomorrow');
+    tomorrowResult.textContent = '明日の天気は ' + tomorr.description + 'です。';
+    document.querySelector('#tomorrow-icon').setAttribute('src', tomorrowIconUrl);
+
+    document.querySelector('.tomorrow-img').classList.remove('hidden');
 
   };
 
+  // 時間を表示するのであればJSTにするため、以下の関数を使う
   const convertJST = (value) => {
     let time = new Date(value.dt_txt);
     time.setHours(time.getHours() + 9);
     return time.toLocaleString().slice(0,-3);
-    // console.log(currentDate);
   }
 
   return (
     <div className='container'>
         <label htmlFor='location'>現在地: </label>
+        {/* セレクトボックスに変更する */}
         <input type='text' id='location' name='location' placeholder='現在地を入力してください' />
         {/* <input type='button' value='送信' onClick={onClick} /> */}
         <button onClick={onClick}>送信</button>
@@ -89,13 +76,17 @@ function Home() {
         <p>(天気予報の結果をここに表示する)</p>
       </div>
       <div className='result' id='result'>
-        <div className='today'>
+        
+        <div>
+          <p className='today'></p>
+          <img id="today-icon" className='today-img hidden' src="" alt="Weather icon"/>
         </div>
-        <div className='tomorrow'></div>
-      </div>
-      <div>
-        imgテスト
-          <img id="icon" src="" alt="Weather icon"/>
+
+        <div>
+          <p className='tomorrow'></p>
+          <img id="tomorrow-icon" className='tomorrow-img hidden' src="" alt="Weather icon"/>
+        </div>
+
       </div>
     </div>
   )
