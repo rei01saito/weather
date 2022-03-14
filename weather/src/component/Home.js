@@ -1,17 +1,24 @@
 import React from 'react'
 import './Home.css'
+import Select from 'react-select'
+import Pref from './Pref'
 
 function Home() {
+
+  const [options, latlon] = Pref();
+
   let city = '';
   let lat = 36;
-  let lon = 140; 
+  let lon = 140;
 
   const onClick = async() => {
-    city = document.querySelector('#location').value || null;
-    if (city === null) {
+    let key = document.querySelector('.pref-select input[name=select]').value
+    if (!key) {
       alert('現在地を入力してください。');
-      return;
+      return false;
     }
+    lat = latlon[key]['lat'];
+    lon = latlon[key]['lon'];
 
     // APIはenvにで管理
     const API_KEY = process.env.REACT_APP_OPENWEATHERMAP_API_KEY;
@@ -34,13 +41,11 @@ function Home() {
     console.log('-----------')
 
     // onecall apiで取得したdailyデータ
-    let today = onecall[0].weather[0]; 
+    let today = onecall[0].weather[0];
     let tomorr = onecall[1].weather[0];
 
     let todayIconUrl = "http://openweathermap.org/img/w/" + today.icon + ".png";
     let tomorrowIconUrl = "http://openweathermap.org/img/w/" + tomorr.icon + ".png";
-
-    const result = document.querySelector('#result');
 
     // 今日
     const todayResult = document.querySelector('.today');
@@ -59,19 +64,20 @@ function Home() {
   };
 
   // 時間を表示するのであればJSTにするため、以下の関数を使う
-  const convertJST = (value) => {
-    let time = new Date(value.dt_txt);
-    time.setHours(time.getHours() + 9);
-    return time.toLocaleString().slice(0,-3);
-  }
+  // const convertJST = (value) => {
+  //   let time = new Date(value.dt_txt);
+  //   time.setHours(time.getHours() + 9);
+  //   return time.toLocaleString().slice(0,-3);
+  // }
 
   return (
     <div className='container'>
         <label htmlFor='location'>現在地: </label>
         {/* セレクトボックスに変更する */}
+        <Select options={options} name='select' className='pref-select' />
         <input type='text' id='location' name='location' placeholder='現在地を入力してください' />
         {/* <input type='button' value='送信' onClick={onClick} /> */}
-        <button onClick={onClick}>送信</button>
+        <button onClick={onClick}>検索</button>
       <div className='title'>
         <p>(天気予報の結果をここに表示する)</p>
       </div>
