@@ -10,5 +10,6 @@
 ### 技術
 - React
 
-### 残タスク
-- 日本語化
+### 参考サイト
+- http://api.ryans.jp/weather/top.html
+- https://www.javadrive.jp/google-maps-javascript/data/index1.html
