@@ -3,6 +3,9 @@
 ### 概要
 - 天気予報アプリケーション
 
+### URL
+https://today-and-tomorrow-weather.herokuapp.com
+
 ### 機能
 - 現在地を設定できるUI
 - 設定された地域の当日、翌日の天気を表示
